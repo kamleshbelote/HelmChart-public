@@ -1,24 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "parentapp.fullname" . }}
+  name: {{ include "devchart.fullname" . }}
+  namespace: {{ .Values.namespace.name }}  
   labels:
-    {{- include "parentapp.labels" . | nindent 4 }}
+    {{- include "devchart.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "parentapp.selectorLabels" . | nindent 6 }}
+      {{- include "devchart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      namespace: {{ .Values.namespace.name }}
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "parentapp.labels" . | nindent 8 }}
+        {{- include "devchart.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +29,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "parentapp.serviceAccountName" . }}
+      serviceAccountName: {{ include "devchart.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -38,12 +40,19 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          env:
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
+          {{- range  .Values.service.ports }}
+            - name: {{ .name | default "http" }}
+              containerPort: {{ .containerPort | default .port }}              
+              protocol: {{ .protocol | default "TCP" }}
+          {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
