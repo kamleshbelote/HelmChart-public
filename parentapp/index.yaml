@@ -3,7 +3,17 @@ entries:
   parentapp:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-06-15T10:31:44.031324009-05:00"
+    created: "2025-06-15T10:36:22.325907078-05:00"
+    description: A Helm chart for Kubernetes
+    digest: 27b69649d4514333de458c8fa7355fd8f85ce3673fa2691fc00772100d04d2ed
+    name: parentapp
+    type: application
+    urls:
+    - parentapp-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-06-15T10:36:22.322962038-05:00"
     description: A Helm chart for Kubernetes
     digest: ac00af66d2007f01e17b5e6563a88a3a239907f4ff96bccdd293ec7dbf069ac3
     name: parentapp
@@ -11,4 +21,4 @@ entries:
     urls:
     - parentapp-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-15T10:31:44.02933982-05:00"
+generated: "2025-06-15T10:36:22.319489868-05:00"
