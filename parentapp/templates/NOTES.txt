@@ -1,22 +1,46 @@
-1. Get the application URL by running these commands:
-{{- if .Values.ingress.enabled }}
+{{- if .Values.ingress.enabled -}}
+The HelmGrpc application has been installed successfully!
+
+Your application can be accessed through the following URLs:
 {{- range $host := .Values.ingress.hosts }}
   {{- range .paths }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
   {{- end }}
 {{- end }}
-{{- else if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "parentapp.fullname" . }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
-{{- else if contains "LoadBalancer" .Values.service.type }}
-     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch its status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "parentapp.fullname" . }}'
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "parentapp.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo http://$SERVICE_IP:{{ .Values.service.port }}
-{{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "parentapp.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+The application exposes the following services:
+- gRPC service for Helm operations 
+{{- if contains "investor.process.api" .Values.image.repository }}
+- REST API for process management (Swagger UI available at /swagger)
+{{- else if contains "investor.system.api" .Values.image.repository }}
+- System gRPC service 
 {{- end }}
+
+{{- else if and .Values.service.ports (eq (index .Values.service.ports 0).type "NodePort") }}
+The HelmGrpc application has been installed successfully!
+
+To access the gRPC service:
+  export NODE_PORT=$(kubectl get --namespace {{ .Values.namespace.name }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "devchart.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Values.namespace.name }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "gRPC service available at $NODE_IP:$NODE_PORT"
+
+{{- else if and .Values.service.ports (eq (index .Values.service.ports 0).type "ClusterIP") }}
+The HelmGrpc application has been installed successfully!
+
+To access the gRPC service from within the cluster:
+  - Service name: {{ include "devchart.fullname" . }}.{{ .Values.namespace.name }}.svc.cluster.local
+  {{- range .Values.service.ports }}
+  - Port: {{ .port }}
+  {{- end }}
+
+For debugging the pod:
+  kubectl --namespace {{ .Values.namespace.name }} port-forward svc/{{ include "devchart.fullname" . }} 8080:8080
+
+{{- end }}
+
+For more information:
+- View application logs: kubectl logs --namespace {{ .Values.namespace.name }} deployment/{{ include "devchart.fullname" . }}
+- Check deployment status: kubectl get deployment --namespace {{ .Values.namespace.name }} {{ include "devchart.fullname" . }}
+- Access the Kubernetes dashboard (if enabled): kubectl proxy & open http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+Thank you for using HelmGrpc!
