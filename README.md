@@ -205,7 +205,7 @@ image:
 service:
   ports:
     - name: http
-      port: 8080      
+      port: 8080
       targetPort: 8080
       protocol: TCP
       type: ClusterIP
