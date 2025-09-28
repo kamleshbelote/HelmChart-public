@@ -2,16 +2,31 @@
 
 ## Introduction
 
-This repository contains a Helm chart for deploying the ParentApp application on Kubernetes clusters. The chart provides a flexible and configurable way to deploy containerized applications with support for services, ingress, autoscaling, and more.
+This repository contains a Helm chart for deploying the ParentApp application on Kubernetes clusters. The chart provides a flexible and configurable way to deploy containerized applications with supported features like ingress, autoscaling, and customizable resources.
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/commonchart)](https://artifacthub.io/packages/search?repo=commonchart)
+
+## Repository & Cloning
+
+Clone this repository if you want to work with the chart sources locally (lint, template, package, publish, etc.).
+
+```bash
+git clone https://github.com/kamleshbelote/HelmChart-public.git
+
+git clone git@github.com:kamleshbelote/HelmChart-public.git
+```
+
+If you previously cloned with an incorrect remote URL, fix it using:
+
+```bash
+git remote set-url origin https://github.com/kamleshbelote/HelmChart-public.git
+```
 
 ## Chart Details
 
 - **Chart Version**: 0.2.0
 - **App Version**: 1.16.0
 - **Type**: Application Chart
-
 
 ## Prerequisites
 
@@ -21,10 +36,14 @@ This repository contains a Helm chart for deploying the ParentApp application on
 
 ## Adding the Helm Repository
 
+Add the published chart repository (GitHub Pages for this repository):
+
 ```bash
-helm repo add parentappv1 https://kamleshbelote.github.io/HelmChart/parentapp/
+helm repo add parentappv1 https://kamleshbelote.github.io/HelmChart-public/parentapp/
 helm repo update
 ```
+
+If you see a 404 or index not found, ensure the GitHub Pages site is enabled for the `main` branch (or `gh-pages` if you publish there) and that `index.yaml` contains the `parentapp` chart. Adjust the URL if your publishing path differs.
 
 ## Installing the Chart
 
@@ -266,7 +285,7 @@ helm install my-app parentappv1/parentapp -f my-values.yaml
 2. **Repository not found**
    - **Solution**: Make sure you've added the repository correctly:
      ```bash
-     helm repo add parentappv1 https://kamleshbelote.github.io/HelmChart/parentapp/
+     helm repo add parentappv1 https://kamleshbelote.github.io/HelmChart-public/parentapp/
      helm repo update
      ```
 
